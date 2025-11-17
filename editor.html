@@ -44,8 +44,8 @@
   <div id="toolbar">
     <h2 style="margin:0 10px 0 0;font-size:18px">TABRANI By MT</h2>
     <button onclick="addNode('input')">商 Trader</button>
-    <button onclick="addNode('function')">+ Function</button>
-    <button onclick="addNode('output')">+ Debug</button>
+    <button onclick="addNode('function')">Deposit</button>
+    <button onclick="addNode('output')">儈 Broker</button>
     <button class="mqtt-in" onclick="addNode('mqtt-in')">MQTT In</button>
     <button class="mqtt-out" onclick="addNode('mqtt-out')">MQTT Out</button>
     <button class="http" onclick="addNode('http')">HTTP Req</button>
@@ -83,7 +83,7 @@
     const ctx=document.getElementById('contextMenu');
     const editModal=document.getElementById('editModal');
 
-    const labels={input:'商 Trader',function:'Function',output:'Debug','mqtt-in':'MQTT In','mqtt-out':'MQTT Out',http:'HTTP Req',telegram:'Telegram',whatsapp:'WhatsApp'};
+    const labels={input:'商 Trader',funtion:'Deposit',output:'Broker','mqtt-in':'MQTT In','mqtt-out':'MQTT Out',http:'HTTP Req',telegram:'Telegram',whatsapp:'WhatsApp'};
 
     function addNode(t){
       nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});
