@@ -21,6 +21,9 @@
     .node.input{background:#A8E6A1;border-color:#2e7d32}
     .node.function{background:#B3E5FC;border-color:#01579b}
     .node.output{background:#FFAB91;border-color:#d84315}
+    .node.xauusd{background:#f1c232;border-color:#2e7d32}
+    .node.eurusd{background:#B3E5FC;border-color:#01579b}
+    .node.h1{background:#FFAB91;border-color:#d84315}
     .node.mqtt-in{background:#A5D6A7;border-color:#2e7d32}
     .node.mqtt-out{background:#81C784;border-color:#1b5e20}
     .node.http{background:#B39DDB;border-color:#512da8}
@@ -44,9 +47,9 @@
   <div id="toolbar">
     <h2 style="margin:0 10px 0 0;font-size:18px">TABRANI By MT</h2>
     <button onclick="addNode('input')">Trader</button>
-    <button onclick="addNode('input')">XAUUSD</button>
-    <button onclick="addNode('input')">EURUSD</button>
-    <button onclick="addNode('input')">Take Profit</button>
+    <button onclick="addNode('xauusd')">XAUUSD</button>
+    <button onclick="addNode('eurusd')">EURUSD</button>
+    <button onclick="addNode('h1')">H1</button>
     <button onclick="addNode('function')">Deposit</button>
     <button onclick="addNode('output')">Broker</button>
     <button class="mqtt-in" onclick="addNode('mqtt-in')">Profit</button>
@@ -86,7 +89,7 @@
     const ctx=document.getElementById('contextMenu');
     const editModal=document.getElementById('editModal');
 
-    const labels={input:'Trader',function:'Deposit',output:'Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
+    const labels={input:'Trader',xauusd:'XAUUSD',eurusd:'EURUSD',h1:'H1',function:'Deposit',output:'Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
 
     function addNode(t){
       nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});
