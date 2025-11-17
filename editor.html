@@ -19,6 +19,7 @@
     #canvas{height:80vh;position:relative;background:#fdfdfd}
     .node{position:absolute;width:100px;height:50px;border:2px solid #000;border-radius:8px;text-align:center;line-height:50px;cursor:move;user-select:none;box-shadow:0 3px 8px rgba(0,0,0,0.15);font-weight:bold;font-size:13px;color:#000}
     .node.input{background:#A8E6A1;border-color:#2e7d32}
+    .node.investor{background:#7FD7FF;border-color:#0088cc}
     .node.function{background:#B3E5FC;border-color:#01579b}
     .node.output{background:#FFAB91;border-color:#d84315}
     .node.xauusd{background:#f1c232;border-color:#2e7d32}
@@ -47,6 +48,7 @@
   <div id="toolbar">
     <h2 style="margin:0 10px 0 0;font-size:18px">TABRANI By MT</h2>
     <button onclick="addNode('input')">Trader</button>
+    <button onclick="addNode('investor')">Investor</button>
     <button onclick="addNode('xauusd')">XAUUSD</button>
     <button onclick="addNode('eurusd')">EURUSD</button>
     <button onclick="addNode('h1')">H1</button>
@@ -89,7 +91,7 @@
     const ctx=document.getElementById('contextMenu');
     const editModal=document.getElementById('editModal');
 
-    const labels={input:'Trader',xauusd:'XAUUSD',eurusd:'EURUSD',h1:'H1',function:'Deposit',output:'Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
+    const labels={input:'Trader',investor:'Investor',xauusd:'XAUUSD',eurusd:'EURUSD',h1:'H1',function:'Deposit',output:'Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
 
     function addNode(t){
       nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});
