@@ -47,7 +47,7 @@
     <button onclick="addNode('function')">Deposit</button>
     <button onclick="addNode('output')">儈 Broker</button>
     <button class="mqtt-in" onclick="addNode('mqtt-in')">Profit</button>
-    <button class="mqtt-out" onclick="addNode('mqtt-out')">WD Withdrawal</button>
+    <button class="mqtt-out" onclick="addNode('mqtt-out')">Withdrawal</button>
     <button class="http" onclick="addNode('http')">Sinyal</button>
     <button class="social" onclick="addNode('telegram')">Buy Beli</button>
     <button class="social whatsapp" onclick="addNode('whatsapp')">Sell Jual</button>
@@ -83,7 +83,7 @@
     const ctx=document.getElementById('contextMenu');
     const editModal=document.getElementById('editModal');
 
-    const labels={input:'商 Trader',function:'Deposit',output:'儈 Broker','mqtt-in':'Profit','mqtt-out':'WD Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
+    const labels={input:'商 Trader',function:'Deposit',output:'儈 Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
 
     function addNode(t){
       nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});
