@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TABRANI - Trading Flow Editor</title>
+  <title>TABRANI - Tinggi Atas Bawah Rendah Awal Nilai Inti</title>
   <style>
-    body{margin:0;font-family:-apple-system,Arial,sans-serif;background:#f0f0f0;display:flex;flex-direction:column;height:100vh}
+    body{margin:0;font-family:-apple-system,Arial,sans-serif;background:#f0f0f0}
     #toolbar{padding:12px;background:#0066ff;color:white;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,0.2);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;position:relative}
     button{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;background:white;color:#0066ff;font-size:14px}
     button:hover{background:#e3f2fd}
@@ -16,8 +16,7 @@
     .http{background:#7E57C2;color:white}
     .social{background:#0088cc;color:white}
     .social.whatsapp{background:#25D366}
-    #main{display:flex;flex:1;position:relative}
-    #canvas{flex:1;position:relative;background:#fdfdfd;overflow:hidden}
+    #canvas{height:80vh;position:relative;background:#fdfdfd}
     .node{position:absolute;width:100px;height:50px;border:2px solid #000;border-radius:8px;text-align:center;line-height:50px;cursor:move;user-select:none;box-shadow:0 3px 8px rgba(0,0,0,0.15);font-weight:bold;font-size:13px;color:#000}
     .node.input{background:#A8E6A1;border-color:#2e7d32}
     .node.function{background:#B3E5FC;border-color:#01579b}
@@ -33,30 +32,20 @@
     svg.connections path{fill:none;stroke:#0066ff;stroke-width:4}
     #contextMenu{position:absolute;background:white;border:2px solid #0066ff;border-radius:8px;padding:8px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9999;display:none;font-size:14px}
     #contextMenu button{background:#0066ff;color:white;width:100%;margin:4px 0;padding:8px}
-    #footer{position:absolute;bottom:8px;left:12px;font-size:11px;color:#666;z-index:10}
-
-    /* === TRADING PANEL === */
-    #tradingPanel{width:320px;background:#1e1e1e;color:#fff;padding:15px;box-sizing:border-box;overflow-y:auto;box-shadow:-4px 0 15px rgba(0,0,0,0.3);z-index:100}
-    #tradingPanel h3{margin:0 0 15px;text-align:center;background:#0066ff;padding:10px;border-radius:8px}
-    .pair-btn{background:#333;padding:10px;margin:5px 0;border-radius:6px;text-align:center;cursor:pointer;font-weight:bold}
-    .pair-btn.active{background:#0066ff}
-    .price{display:block;font-size:24px;font-weight:bold;text-align:center;margin:10px 0;color:#00ff00}
-    input, select{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}
-    .btn-buy{background:#00c853;color:white;font-weight:bold}
-    .btn-sell{background:#d50000;color:white;font-weight:bold}
-    .btn-close{background:#ff9800;color:white;margin-top:10px}
-    #tradeLog{margin-top:15px;max-height:300px;overflow-y:auto;background:#111;padding:10px;border-radius:6px;font-size:12px}
-    .log-entry{margin:5px 0;padding:8px;background:#222;border-radius:4px}
-    .log-buy{color:#00ff00}
-    .log-sell{color:#ff5252}
+    #footer{position:absolute;bottom:8px;left:12px;font-size:11px;color:#666}
+    #editModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;z-index:10000;align-items:center;justify-content:center}
+    #editModal .modal-content{background:white;padding:25px;border-radius:12px;width:340px;max-width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+    #editModal input,#editModal textarea{width:100%;margin:10px 0;padding:12px;border:1px solid #ccc;border-radius:6px;font-family:monospace;font-size:13px}
+    #editModal button{padding:12px;background:#0066ff;color:white;border:none;border-radius:6px;cursor:pointer;margin:5px 0;width:100%;font-weight:bold}
+    a{color:white;text-decoration:underline;font-size:14px}
   </style>
 </head>
 <body>
   <div id="toolbar">
     <h2 style="margin:0 10px 0 0;font-size:18px">TABRANI By MT</h2>
-    <button onclick="addNode('input')">商 Trader</button>
+    <button onclick="addNode('input')">Trader</button>
     <button onclick="addNode('function')">Deposit</button>
-    <button onclick="addNode('output')">儈 Broker</button>
+    <button onclick="addNode('output')">Broker</button>
     <button class="mqtt-in" onclick="addNode('mqtt-in')">Profit</button>
     <button class="mqtt-out" onclick="addNode('mqtt-out')">Withdrawal</button>
     <button class="http" onclick="addNode('http')">Sinyal</button>
@@ -66,139 +55,105 @@
     <button onclick="loadFlow()">Muat</button>
     <button id="exportBtn" onclick="exportFlow()">Export</button>
     <button id="resetBtn" onclick="resetCanvas()">Reset</button>
-    <a href="/" style="color:white">← JSON Editor</a>
+    <a href="/">← JSON Editor</a>
+  </div>
+  <div id="canvas"><svg class="connections"></svg></div>
+  <div id="footer">TABRANI by Mochamad Tabrani • based on Cindo Labs • Apache 2.0</div>
+  <div id="contextMenu">
+    <button onclick="deleteNode(currentNodeId)">Delete Node</button>
+    <button onclick="hideContextMenu()">Cancel</button>
   </div>
 
-  <div id="main">
-    <div id="canvas"><svg class="connections"></svg></div>
-
-    <!-- TRADING PANEL -->
-    <div id="tradingPanel">
-      <h3>TRADING PANEL</h3>
-      <div id="pairs">
-        <div class="pair-btn active" data-pair="BTCUSD">Bitcoin (BTC/USD)</div>
-        <div class="pair-btn" data-pair="EURUSD">EUR/USD</div>
-        <div class="pair-btn" data-pair="XAUUSD">Emas (XAU/USD)</div>
-      </div>
-      <div class="price" id="currentPrice">--</div>
-
-      <label>Lot / Volume</label>
-      <input type="number" id="lot" value="0.01" step="0.01" min="0.01">
-
-      <label>Stop Loss (pips)</label>
-      <input type="number" id="sl" value="50" step="1">
-
-      <label>Take Profit (pips)</label>
-      <input type="number" id="tp" value="100" step="1">
-
-      <button class="btn-buy" onclick="openTrade('buy')">BUY / LONG</button>
-      <button class="btn-sell" onclick="openTrade('sell')">SELL / SHORT</button>
-      <button class="btn-close" onclick="closeAll()">Close All Positions</button>
-
-      <div id="tradeLog">
-        <div style="text-align:center;color:#888">Belum ada transaksi</div>
-      </div>
+  <div id="editModal">
+    <div class="modal-content">
+      <h3>Edit Node</h3>
+      <input id="editLabel" placeholder="Label">
+      <textarea id="editConfig" rows="10" placeholder='Telegram: {"token":"123456:ABC","chatId":"123456789"}\nHTTP: {"url":"https://indodax.com/api/ticker/btcidr"}'></textarea>
+      <button onclick="saveEdit()">Save</button>
+      <button onclick="closeEdit()">Cancel</button>
     </div>
   </div>
 
-  <div id="footer">TABRANI Trading Edition • by Mochamad Tabrani + Grok • 2025</div>
-
-  <!-- Context Menu & Modal tetap sama -->
-  <div id="contextMenu">...</div>
-  <div id="editModal">...</div>
-
   <script>
-    // === Node-RED Logic (sama seperti aslinya) ===
-    let nodes = JSON.parse(localStorage.getItem('nodes') || '[]');
-    let edges = JSON.parse(localStorage.getItem('edges') || '[]');
-    let dragging = null, connecting = null, currentNodeId = null, editingNode = null;
-    const canvas = document.getElementById('canvas');
-    const svg = document.querySelector('svg.connections');
-    const ctx = document.getElementById('contextMenu');
-    const editModal = document.getElementById('editModal');
-    const labels = {input:'商 Trader',function:'Deposit',output:'儈 Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
+    let nodes=JSON.parse(localStorage.getItem('nodes')||'[]');
+    let edges=JSON.parse(localStorage.getItem('edges')||'[]');
+    let dragging=null,connecting=null,currentNodeId=null,editingNode=null;
+    const canvas=document.getElementById('canvas');
+    const svg=document.querySelector('svg.connections');
+    const ctx=document.getElementById('contextMenu');
+    const editModal=document.getElementById('editModal');
 
-    // ... (semua fungsi addNode, render, saveFlow, dll tetap sama seperti kode awalmu) ...
-    // Saya hanya copy fungsi penting agar tetap jalan
-    function addNode(t){nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});render();saveFlow();}
-    function renderNodes(){/* sama seperti asli */ document.querySelectorAll('.node').forEach(n=>n.remove()); nodes.forEach(n=>{/* create node */});}
-    function drawConnections(){/* sama */ svg.innerHTML=''; edges.forEach(e=>{/* draw path */});}
+    const labels={input:'Trader',function:'Deposit',output:'Broker','mqtt-in':'Profit','mqtt-out':'Withdrawal',http:'Sinyal',telegram:'Buy Beli',whatsapp:'Sell Jual'};
+
+    function addNode(t){
+      nodes.push({id:'n'+Date.now(),type:t,x:150+Math.random()*600,y:100+Math.random()*300,label:labels[t],config:{}});
+      render();saveFlow();
+    }
+
+    function drawConnections(){
+      svg.innerHTML='';
+      edges.forEach(e=>{
+        const s=nodes.find(n=>n.id===e.source);
+        const d=nodes.find(n=>n.id===e.target);
+        if(!s||!d)return;
+        const x1=s.x+106,y1=s.y+25,x2=d.x-6,y2=d.y+25;
+        const c=Math.abs(x2-x1)*0.5;
+        const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d',`M${x1},${y1} C${x1+c},${y1} ${x2-c},${y2} ${x2},${y2}`);
+        svg.appendChild(p);
+      });
+    }
+
+    function renderNodes(){
+      document.querySelectorAll('.node').forEach(n=>n.remove());
+      nodes.forEach(n=>{
+        const div=document.createElement('div');
+        div.className=`node ${n.type}`;div.id=n.id;div.innerText=n.label;
+        div.style.left=n.x+'px';div.style.top=n.y+'px';
+
+        div.addEventListener('dblclick',(e)=>{e.stopPropagation();editingNode=n;document.getElementById('editLabel').value=n.label;document.getElementById('editConfig').value=JSON.stringify(n.config||{},null,2);editModal.style.display='flex';});
+
+        ['in','out'].forEach(p=>{const port=document.createElement('div');port.className=`port ${p}`;div.appendChild(port);});
+
+        div.addEventListener('contextmenu',e=>{e.preventDefault();currentNodeId=n.id;ctx.style.left=e.clientX+'px';ctx.style.top=e.clientY+'px';ctx.style.display='block';});
+        div.addEventListener('mousedown',e=>{if(e.button!==0||e.target.classList.contains('port'))return;dragging={node:n,offsetX:e.clientX-n.x,offsetY:e.clientY-n.y};});
+        div.querySelector('.port.out').addEventListener('mousedown',e=>{e.stopPropagation();connecting={source:n.id};});
+        div.querySelector('.port.in').addEventListener('mouseup',e=>{
+          if(connecting&&connecting.source!==n.id){
+            edges=edges.filter(x=>!(x.source===connecting.source&&x.target===n.id));
+            edges.push({source:connecting.source,target:n.id});
+            connecting=null;render();saveFlow();
+          }
+        });
+        canvas.appendChild(div);
+      });
+    }
+
     function render(){renderNodes();drawConnections();}
+    document.addEventListener('mousemove',e=>{if(dragging){dragging.node.x=e.clientX-dragging.offsetX;dragging.node.y=e.clientY-dragging.offsetY;render();saveFlow();}});
+    document.addEventListener('mouseup',()=>{dragging=null;connecting=null;});
+    document.addEventListener('click',()=>{ctx.style.display='none';});
+
+    function saveEdit(){
+      if(!editingNode)return;
+      editingNode.label=document.getElementById('editLabel').value||editingNode.label;
+      try{editingNode.config=JSON.parse(document.getElementById('editConfig').value||'{}');}
+      catch(e){alert('Config harus JSON valid!');return;}
+      closeEdit();render();saveFlow();
+    }
+    function closeEdit(){editModal.style.display='none';editingNode=null;}
+    function hideContextMenu(){ctx.style.display='none';}
+
+    function deleteNode(id){nodes=nodes.filter(n=>n.id!==id);edges=edges.filter(e=>e.source!==id&&e.target!==id);render();saveFlow();}
+    function resetCanvas(){if(confirm('Hapus semua?')){nodes=[];edges=[];localStorage.clear();render();}}
     function saveFlow(){localStorage.setItem('nodes',JSON.stringify(nodes));localStorage.setItem('edges',JSON.stringify(edges));}
     function loadFlow(){location.reload();}
-    // (fungsi drag, connect, edit, delete tetap sama — saya skip di sini agar tidak terlalu panjang)
-
-    // === TRADING PANEL LOGIC ===
-    let currentPair = "BTCUSD";
-    let prices = {BTCUSD: 67000, EURUSD: 1.0850, XAUUSD: 2650};
-    let positions = [];
-
-    document.querySelectorAll('.pair-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentPair = btn.dataset.pair;
-        updatePrice();
-      });
-    });
-
-    function updatePrice() {
-      document.getElementById('currentPrice').innerText = prices[currentPair].toFixed(currentPair === 'EURUSD' ? 4 : 2);
+    function exportFlow(){
+      const flow=nodes.map(n=>({id:n.id,type:n.type,name:n.label,x:n.x,y:n.y,config:n.config||{},wires:edges.filter(e=>e.source===n.id).map(e=>[e.target])}));
+      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(flow,null,2)],{type:'application/json'}));a.download='nodeblu-flow.json';a.click();
     }
 
-    // Fake realtime price (naik turun random tiap 3 detik)
-    setInterval(() => {
-      const change = (Math.random() - 0.5) * (currentPair === 'BTCUSD' ? 200 : currentPair === 'XAUUSD' ? 10 : 0.002);
-      prices[currentPair] += change;
-      if (document.querySelector(`.pair-btn[data-pair="${currentPair}"]`).classList.contains('active')) {
-        updatePrice();
-      }
-    }, 3000);
-
-    function openTrade(direction) {
-      const lot = parseFloat(document.getElementById('lot').value);
-      const sl = parseFloat(document.getElementById('sl').value);
-      const tp = parseFloat(document.getElementById('tp').value);
-      const price = prices[currentPair];
-
-      const trade = {
-        id: Date.now(),
-        pair: currentPair,
-        direction: direction.toUpperCase(),
-        entry: price,
-        lot: lot,
-        sl: direction === 'BUY' ? price - sl * (currentPair === 'EURUSD' ? 0.0001 : currentPair === 'XAUUSD' ? 1 : 10) : price + sl * (currentPair === 'EURUSD' ? 0.0001 : currentPair === 'XAUUSD' ? 1 : 10),
-        tp: direction === 'BUY' ? price + tp * (currentPair === 'EURUSD' ? 0.0001 : currentPair === 'XAUUSD' ? 1 : 10) : price - tp * (currentPair === 'EURUSD' ? 0.0001 : currentPair === 'XAUUSD' ? 1 : 10),
-        time: new Date().toLocaleTimeString()
-      };
-
-      positions.push(trade);
-      addLog(trade);
-    }
-
-    function addLog(trade) {
-      const log = document.getElementById('tradeLog');
-      const div = document.createElement('div');
-      div.className = `log-entry log-${trade.direction.toLowerCase()}`;
-      div.innerHTML = `<b>${trade.direction}</b> ${trade.pair} @ ${trade.entry.toFixed(currentPair==='EURUSD'?4:2)} | Lot: ${trade.lot} | SL: ${trade.sl.toFixed(currentPair==='EURUSD'?4:2)} | TP: ${trade.tp.toFixed(currentPair==='EURUSD'?4:2)} <small>(${trade.time})</small>`;
-      log.prepend(div);
-    }
-
-    function closeAll() {
-      if (positions.length === 0) return alert('Tidak ada posisi terbuka');
-      positions.forEach(p => {
-        const profit = p.direction === 'BUY' 
-          ? (prices[currentPair] - p.entry) * (currentPair === 'BTCUSD' ? 1 : currentPair === 'XAUUSD' ? 10 : 10000) * p.lot
-          : (p.entry - prices[currentPair]) * (currentPair === 'BTCUSD' ? 1 : currentPair === 'XAUUSD' ? 10 : 10000) * p.lot;
-        addLog({...p, direction: 'CLOSE', profit: profit.toFixed(2)});
-      });
-      positions = [];
-      alert('Semua posisi ditutup!');
-    }
-
-    // Init
     render();
-    updatePrice();
   </script>
 </body>
 </html>
